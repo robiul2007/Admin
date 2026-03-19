@@ -21,7 +21,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Jost', sans-serif; }
         body { display: flex; background-color: var(--bg-color); color: var(--text-main); height: 100vh; overflow: hidden; transition: 0.3s; }
         #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1e1e2d; display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .auth-box { background: #ffffff; padding: 40px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .auth-box { background: var(--card-bg); padding: 40px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .auth-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--input-bg); color: var(--text-main); }
         .auth-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .auth-switch { margin-top: 15px; font-size: 13px; color: #888; cursor: pointer; text-decoration: underline; }
@@ -48,7 +48,7 @@
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 25px; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; color: var(--text-main); }
-        input[type="text"], input[type="number"], select { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--input-bg); color: var(--text-main); }
+        input[type="text"], input[type="password"], input[type="number"], select { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--input-bg); color: var(--text-main); }
         .full-width { grid-column: 1 / -1; }
         .upload-area { border: 2px dashed var(--primary); padding: 30px; text-align: center; border-radius: 8px; cursor: pointer; background: var(--input-bg); transition: 0.3s; }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 2000; }
@@ -108,13 +108,13 @@
             </div>
             <div class="card"><div class="card-header"><h3>Revenue Analytics</h3></div><div style="padding: 20px;"><canvas id="salesChart" height="80"></canvas></div></div>
         </div>
+
         <div id="products-view" class="view-section">
             <div class="card">
                 <div class="card-header"><h3>Live Inventory</h3><button class="btn-primary" onclick="fetchData()"><i class="fas fa-sync"></i> Refresh</button></div>
-                <div style="overflow-x: auto;"><table><thead><tr><th>Image</th><th>Name</th><th>Price & Discount</th><th>Stock</th><th>Action</th></tr></thead><tbody id="products-table"></tbody></table></div>
+                <div style="overflow-x: auto;"><table><thead><tr><th>Image</th><th>Name & Mode</th><th>Price & Discount</th><th>Stock</th><th>Action</th></tr></thead><tbody id="products-table"></tbody></table></div>
             </div>
         </div>
-
         <div id="add-product-view" class="view-section">
             <div class="card">
                 <div class="card-header"><h3>Publish Product</h3></div>
@@ -122,10 +122,10 @@
                     <div class="form-group"><label>Product Name</label><input type="text" id="p_name" required></div>
                     <div class="form-group"><label>Selling Price (₹)</label><input type="number" id="p_price" required></div>
                     <div class="form-group"><label>Discount (%)</label><input type="number" id="p_discount" placeholder="e.g. 20"></div>
-                    <div class="form-group"><label>Special Coupon</label><input type="text" id="p_coupon" placeholder="e.g. RS178K"></div>
-                    <div class="form-group"><label>Category</label><select id="p_category"><option>Abaya</option><option>Hijab</option><option>Undercaps</option></select></div>
+                    <div class="form-group"><label>Coupon Code</label><input type="text" id="p_coupon" placeholder="e.g. RS178K"></div>
+                    <div class="form-group full-width"><label>Payment Mode Eligibility</label><select id="p_paymentMode"><option value="Both">COD & UPI Allowed</option><option value="UPI Only">UPI Only (Prepaid / No COD)</option></select></div>
                     <div class="form-group"><label>Initial Stock</label><input type="number" id="p_stock" value="10"></div>
-                    <div class="form-group full-width"><label>Status</label><select id="p_status"><option>Active</option><option>Out of Stock</option></select></div>
+                    <div class="form-group"><label>Status</label><select id="p_status"><option>Active</option><option>Out of Stock</option></select></div>
                     <div class="form-group full-width">
                         <label>Product Images (Select up to 4)</label>
                         <div class="upload-area" onclick="document.getElementById('p_images').click()"><i class="fas fa-cloud-upload-alt"></i><p>Tap here to browse files</p></div>
@@ -136,134 +136,82 @@
                 </form>
             </div>
         </div>
-        <div id="orders-view" class="view-section">
-            <div class="card">
-                <div class="card-header"><h3>Order Management Center</h3><button class="btn-primary" onclick="fetchData()">Refresh</button></div>
-                <div style="overflow-x: auto;"><table><thead><tr><th>Customer Info</th><th>Items & Total</th><th>Status</th><th>Actions & Delivery</th></tr></thead><tbody id="orders-table"></tbody></table></div>
-            </div>
-        </div>
 
-        <div id="customers-view" class="view-section">
-            <div class="card">
-                <div class="card-header"><h3>Registered Customers</h3><button class="btn-primary" onclick="fetchData()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
-                <div style="overflow-x: auto;"><table><thead><tr><th>User ID</th><th>Name</th><th>Phone</th><th>Account Actions</th></tr></thead><tbody id="customers-table"></tbody></table></div>
-            </div>
-        </div>
-
+        <div id="orders-view" class="view-section"><div class="card"><div class="card-header"><h3>Order Management Center</h3><button class="btn-primary" onclick="fetchData()">Refresh</button></div><div style="overflow-x: auto;"><table><thead><tr><th>Customer Info</th><th>Items & Total</th><th>Status</th><th>Actions & Delivery</th></tr></thead><tbody id="orders-table"></tbody></table></div></div></div>
+        <div id="customers-view" class="view-section"><div class="card"><div class="card-header"><h3>Registered Customers</h3><button class="btn-primary" onclick="fetchData()"><i class="fas fa-sync-alt"></i> Refresh</button></div><div style="overflow-x: auto;"><table><thead><tr><th>User ID</th><th>Name</th><th>Phone</th><th>Account Actions</th></tr></thead><tbody id="customers-table"></tbody></table></div></div></div>
         <div id="settings-view" class="view-section">
             <div class="card">
                 <div class="card-header"><h3>Admin Profile & Settings</h3></div>
                 <div class="form-grid">
-                    <div class="form-group full-width" style="display: flex; align-items: center; gap: 20px;">
-                        <img id="settings-avatar-preview" src="https://via.placeholder.com/80" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary);">
-                        <div><label>Upload Profile Picture</label><input type="file" accept="image/*" onchange="updateProfilePic(event)" style="background: transparent; border: none; padding: 0;"></div>
-                    </div>
+                    <div class="form-group full-width" style="display: flex; align-items: center; gap: 20px;"><img id="settings-avatar-preview" src="https://via.placeholder.com/80" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary);"><div><label>Upload Profile Picture</label><input type="file" accept="image/*" onchange="updateProfilePic(event)" style="background: transparent; border: none; padding: 0;"></div></div>
                     <div class="form-group full-width"><label>Admin Username</label><input type="text" id="set-username" disabled></div>
-                    <div class="form-group"><label>Instagram Handle</label><input type="text" value="rs__fashion____009"></div>
-                    <div class="form-group"><label>UPI ID</label><input type="text" placeholder="yourname@upi"></div>
-                    <div class="form-group full-width"><button class="btn-primary" onclick="showToast('✅ Settings Saved Successfully!', 'success')">Save Store Configuration</button></div>
+                    <div class="form-group"><label>Instagram Handle</label><input type="text" id="set-insta" placeholder="e.g. rs_fashion_009"></div>
+                    <div class="form-group"><label>UPI ID (For Main Website)</label><input type="text" id="set-upi" placeholder="yourname@upi"></div>
+                    <div class="form-group full-width"><button class="btn-primary" onclick="saveSettings()">Save Store Configuration</button></div>
                 </div>
             </div>
+            <div class="card" style="margin-top: 20px; border: 1px solid #f64e60;"><div class="card-header" style="border-bottom: 1px solid rgba(246,78,96,0.2);"><h3 style="color: #f64e60;"><i class="fas fa-exclamation-triangle"></i> Danger Zone: Wipe Data</h3></div><div class="form-grid"><div class="form-group full-width" id="setup-del-pass-section"><label>Set Secure Deletion Password (Required to delete data)</label><div style="display:flex; gap:10px;"><input type="password" id="new-del-pass" placeholder="Create a deletion password"><button class="btn-primary" onclick="setDeletePassword()">Save Password</button></div></div><div class="form-group full-width" id="reset-del-pass-section" style="display:none; background: rgba(246, 78, 96, 0.05); padding: 15px; border-radius: 8px;"><label style="color: #f64e60; font-weight:bold; margin-bottom:10px;">Reset Deletion Password</label><input type="text" id="reset-user" placeholder="Admin Username" style="margin-bottom:10px;"><input type="password" id="reset-login-pass" placeholder="Admin Login Password" style="margin-bottom:10px;"><input type="password" id="reset-new-del-pass" placeholder="New Deletion Password" style="margin-bottom:10px;"><button class="btn-primary" style="background: #f64e60;" onclick="resetDeletePassword()">Reset Password</button><div style="text-align:right; margin-top:10px;"><a href="#" onclick="hideResetDelPass()" style="color:#888; font-size:12px;">Cancel</a></div></div><div class="form-group full-width" style="display: flex; gap: 10px; flex-wrap: wrap;" id="del-actions-section"><button class="btn-primary" style="background: #ffa800; flex: 1;" onclick="promptDelete('orders')"><i class="fas fa-trash"></i> Delete Orders</button><button class="btn-primary" style="background: #8950fc; flex: 1;" onclick="promptDelete('users')"><i class="fas fa-users-slash"></i> Delete Customers</button><button class="btn-primary" style="background: #f64e60; flex: 1;" onclick="promptDelete('all')"><i class="fas fa-skull-crossbones"></i> Factory Reset</button></div><div class="form-group full-width" style="text-align: right; margin-top:-10px;"><a href="#" onclick="showResetDelPass()" id="forgot-del-btn" style="color: #888; font-size: 12px; text-decoration: underline; display:none;">Forgot Deletion Password?</a></div></div></div>
         </div>
     </div>
+
     <div class="modal-overlay" id="order-details-modal"><div class="modal-content" style="max-width: 500px;"><div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px;"><h2 style="font-family: 'Playfair Display', serif; color: var(--primary);">📦 Shipping Details</h2><button onclick="document.getElementById('order-details-modal').style.display='none'" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #f64e60;"><i class="fas fa-times-circle"></i></button></div><div id="od-content" style="font-size: 15px; line-height: 1.6;">Loading...</div></div></div>
     <div class="modal-overlay" id="confirm-modal"><div class="modal-content" style="max-width: 350px; text-align: center;"><div style="font-size: 40px; margin-bottom: 15px;">🤔</div><h3 id="confirm-msg" style="margin-bottom: 20px;">Are you sure?</h3><div style="display: flex; gap: 10px;"><button class="btn-primary" style="background: #ccc; flex: 1;" onclick="document.getElementById('confirm-modal').style.display='none'">Cancel</button><button class="btn-primary" style="background: #f64e60; flex: 1;" id="confirm-yes-btn">Yes, proceed</button></div></div></div>
     <div class="modal-overlay" id="customer-details-modal"><div class="modal-content"><div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px;"><h2 id="cd-name" style="font-family: 'Playfair Display', serif; color: var(--primary);">Customer Profile</h2><button onclick="document.getElementById('customer-details-modal').style.display='none'" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #f64e60;"><i class="fas fa-times-circle"></i></button></div><h4 style="margin-bottom: 10px;"><i class="fas fa-shopping-cart" style="color: var(--primary);"></i> Items in Cart</h4><div id="cd-cart" class="crm-box">Loading...</div><h4 style="margin-bottom: 10px;"><i class="fas fa-search" style="color: var(--primary);"></i> Recent Searches</h4><div id="cd-searches" class="crm-box" style="display: flex; flex-wrap: wrap; gap: 8px;">Loading...</div><h4 style="margin-bottom: 10px;"><i class="fas fa-box-open" style="color: var(--primary);"></i> Past Orders</h4><div id="cd-orders" class="crm-box">Loading...</div></div></div>
     <div class="modal-overlay" id="edit-modal"><div class="modal-content" style="max-width: 400px;"><h3 style="margin-bottom: 20px;">Update Inventory</h3><input type="hidden" id="edit-id"><div class="form-group"><label>Stock Quantity</label><input type="number" id="edit-stock"></div><div class="form-group"><label>Product Status</label><select id="edit-status"><option value="Active">In Stock (Active)</option><option value="Out of Stock">Out of Stock</option></select></div><div style="display: flex; gap: 10px; margin-top: 20px;"><button class="btn-primary" style="background: #ccc; flex: 1;" onclick="document.getElementById('edit-modal').style.display='none'">Cancel</button><button class="btn-primary" style="flex: 1;" id="save-edit-btn" onclick="saveProductEdit()">Update</button></div></div></div>
-
+    <div class="modal-overlay" id="delete-auth-modal"><div class="modal-content" style="max-width: 350px; text-align: center;"><div style="font-size: 40px; margin-bottom: 15px;">⚠️</div><h3 id="delete-auth-msg" style="margin-bottom: 15px; color:#f64e60;">Confirm Deletion</h3><p style="font-size: 13px; color: #888; margin-bottom: 15px;">Enter your Secure Deletion Password to proceed.</p><input type="password" id="delete-auth-pass" placeholder="Deletion Password" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--input-bg); color: var(--text-main);"><div style="display: flex; gap: 10px;"><button class="btn-primary" style="background: #ccc; flex: 1;" onclick="document.getElementById('delete-auth-modal').style.display='none'">Cancel</button><button class="btn-primary" style="background: #f64e60; flex: 1;" onclick="executeDelete()">Wipe Data</button></div></div></div>
     <script>
         const DB_URL = "https://leon-41242-default-rtdb.firebaseio.com/";
-        let uploadedImagesBase64 = []; let salesChartInstance = null;
+        let uploadedImagesBase64 = []; let salesChartInstance = null; let pendingDeleteType = '';
 
-        function showToast(msg, type = 'success') {
-            const toast = document.createElement('div'); toast.className = `toast toast-${type}`; toast.innerHTML = `<span>${msg}</span>`; document.body.appendChild(toast);
-            setTimeout(() => toast.classList.add('show'), 10); setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3000);
-        }
-
-        let confirmCallback = null;
-        function customConfirm(msg, callback) { document.getElementById('confirm-msg').innerText = msg; confirmCallback = callback; document.getElementById('confirm-modal').style.display = 'flex'; }
-        document.getElementById('confirm-yes-btn').onclick = () => { document.getElementById('confirm-modal').style.display = 'none'; if(confirmCallback) confirmCallback(); }
+        function showToast(msg, type = 'success') { const toast = document.createElement('div'); toast.className = `toast toast-${type}`; toast.innerHTML = `<span>${msg}</span>`; document.body.appendChild(toast); setTimeout(() => toast.classList.add('show'), 10); setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3000); }
+        let confirmCallback = null; function customConfirm(msg, callback) { document.getElementById('confirm-msg').innerText = msg; confirmCallback = callback; document.getElementById('confirm-modal').style.display = 'flex'; } document.getElementById('confirm-yes-btn').onclick = () => { document.getElementById('confirm-modal').style.display = 'none'; if(confirmCallback) confirmCallback(); }
 
         window.onload = () => {
+            const isDark = localStorage.getItem('rsDarkMode') === 'true'; if(isDark) { document.getElementById('theme-icon').className = 'fas fa-sun'; }
             if (localStorage.getItem('rsAdminLoggedIn') === 'true') {
-                document.getElementById('auth-screen').style.display = 'none'; document.getElementById('main-app').style.display = 'flex';
                 document.getElementById('display-admin-name').innerText = localStorage.getItem('rsAdminUser');
-                loadProfileData(); initChart(); fetchData();
+                loadProfileData(); checkDeletePasswordState(); fetchSettings(); initChart(); fetchData();
             }
         };
 
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('rsDarkMode', isDark);
-            document.getElementById('theme-icon').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
-            if(salesChartInstance) { salesChartInstance.destroy(); initChart(); fetchData(); }
-        }
-
+        function toggleTheme() { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('rsDarkMode', isDark); document.getElementById('theme-icon').className = isDark ? 'fas fa-sun' : 'fas fa-moon'; if(salesChartInstance) { salesChartInstance.destroy(); initChart(); fetchData(); } }
         function toggleAuthView() { const l = document.getElementById('login-box'); const s = document.getElementById('signup-box'); l.style.display = l.style.display === 'none' ? 'block' : 'none'; s.style.display = s.style.display === 'none' ? 'block' : 'none'; }
-        
-        function handleAuth(type) {
-            const user = document.getElementById(`${type}-user`).value; const pass = document.getElementById(`${type}-pass`).value;
-            if(!user || !pass) return showToast("⚠️ Please fill all fields!", "error");
-            if(type === 'signup') { 
-                localStorage.setItem('rsAdminCredentials', JSON.stringify({username: user, password: pass})); localStorage.setItem('rsAdminUser', user); localStorage.setItem('rsAdminLoggedIn', 'true');
-                showToast("✅ Account Created!", "success"); setTimeout(() => window.location.reload(), 1000); 
-            } else { 
-                const saved = JSON.parse(localStorage.getItem('rsAdminCredentials')); 
-                if(saved && saved.username === user && saved.password === pass) { localStorage.setItem('rsAdminUser', user); localStorage.setItem('rsAdminLoggedIn', 'true'); window.location.reload(); } 
-                else { showToast("❌ Incorrect Username or Password!", "error"); } 
-            }
-        }
-        
+        function handleAuth(type) { const user = document.getElementById(`${type}-user`).value; const pass = document.getElementById(`${type}-pass`).value; if(!user || !pass) return showToast("⚠️ Please fill all fields!", "error"); if(type === 'signup') { localStorage.setItem('rsAdminCredentials', JSON.stringify({username: user, password: pass})); localStorage.setItem('rsAdminUser', user); localStorage.setItem('rsAdminLoggedIn', 'true'); showToast("✅ Account Created!", "success"); setTimeout(() => window.location.reload(), 1000); } else { const saved = JSON.parse(localStorage.getItem('rsAdminCredentials')); if(saved && saved.username === user && saved.password === pass) { localStorage.setItem('rsAdminUser', user); localStorage.setItem('rsAdminLoggedIn', 'true'); window.location.reload(); } else { showToast("❌ Incorrect Username or Password!", "error"); } } }
         function handleLogout() { localStorage.removeItem('rsAdminUser'); localStorage.removeItem('rsAdminLoggedIn'); window.location.reload(); }
         function loadProfileData() { const savedData = JSON.parse(localStorage.getItem('rsAdminCredentials')); if(savedData && savedData.username) { document.getElementById('set-username').value = savedData.username; if (savedData.profilePic) document.getElementById('settings-avatar-preview').src = savedData.profilePic; } }
         function updateProfilePic(event) { const file = event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = function(e) { const savedData = JSON.parse(localStorage.getItem('rsAdminCredentials')) || {}; savedData.profilePic = e.target.result; localStorage.setItem('rsAdminCredentials', JSON.stringify(savedData)); loadProfileData(); showToast("📷 Profile Picture Updated!", "success"); }; reader.readAsDataURL(file); } }
         function switchTab(tabId, el) { document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active')); document.getElementById(tabId).classList.add('active'); document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); document.getElementById('header-title').innerText = el.innerText; if(window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open'); }
-        function initChart() {
-            const ctx = document.getElementById('salesChart').getContext('2d'); const textColor = document.body.classList.contains('dark-mode') ? '#e4e6ef' : '#888';
-            salesChartInstance = new Chart(ctx, { type: 'line', data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'Revenue (₹)', data: [0,0,0,0,0,0,0], borderColor: '#c5a880', backgroundColor: 'rgba(197, 168, 128, 0.2)', borderWidth: 3, fill: true, tension: 0.4 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks:{color:textColor}, grid:{display:false} }, y: { ticks:{color:textColor}, grid:{color: 'rgba(200,200,200,0.1)'} } } } });
-        }
+
+        async function fetchSettings() { try { let res = await fetch(DB_URL + 'settings.json'); let data = await res.json(); if(data) { if(data.upiId) document.getElementById('set-upi').value = data.upiId; if(data.instagram) document.getElementById('set-insta').value = data.instagram; } } catch(e) {} }
+        async function saveSettings() { const upi = document.getElementById('set-upi').value; const insta = document.getElementById('set-insta').value; try { await fetch(DB_URL + 'settings.json', { method: 'PUT', body: JSON.stringify({ upiId: upi, instagram: insta }) }); showToast('✅ Settings & UPI Saved Successfully!', 'success'); } catch(e) { showToast('❌ Failed to save settings.', 'error'); } }
+        function checkDeletePasswordState() { if(localStorage.getItem('rsDeletePassword')) { document.getElementById('setup-del-pass-section').style.display = 'none'; document.getElementById('forgot-del-btn').style.display = 'block'; } else { document.getElementById('setup-del-pass-section').style.display = 'block'; document.getElementById('forgot-del-btn').style.display = 'none'; } }
+        function setDeletePassword() { const pass = document.getElementById('new-del-pass').value; if(!pass) return showToast("Enter a password!", "error"); localStorage.setItem('rsDeletePassword', pass); showToast("✅ Secure Deletion Password Set!", "success"); checkDeletePasswordState(); }
+        function showResetDelPass() { document.getElementById('reset-del-pass-section').style.display = 'block'; document.getElementById('del-actions-section').style.display = 'none'; document.getElementById('forgot-del-btn').style.display = 'none'; }
+        function hideResetDelPass() { document.getElementById('reset-del-pass-section').style.display = 'none'; document.getElementById('del-actions-section').style.display = 'flex'; checkDeletePasswordState(); }
+        function resetDeletePassword() { const u = document.getElementById('reset-user').value; const p = document.getElementById('reset-login-pass').value; const n = document.getElementById('reset-new-del-pass').value; const saved = JSON.parse(localStorage.getItem('rsAdminCredentials')); if(!u || !p || !n) return showToast("Fill all fields", "error"); if(saved && saved.username === u && saved.password === p) { localStorage.setItem('rsDeletePassword', n); showToast("✅ Deletion Password Reset!", "success"); hideResetDelPass(); } else { showToast("❌ Incorrect Admin Credentials", "error"); } }
+        function promptDelete(type) { if(!localStorage.getItem('rsDeletePassword')) return showToast("⚠️ Set a deletion password first!", "error"); pendingDeleteType = type; document.getElementById('delete-auth-pass').value = ''; document.getElementById('delete-auth-modal').style.display = 'flex'; let msg = type === 'orders' ? 'Delete all orders?' : (type === 'users' ? 'Delete all customers?' : 'Wipe all data (Orders, Customers, Products)?'); document.getElementById('delete-auth-msg').innerText = msg; }
+        async function executeDelete() { const entered = document.getElementById('delete-auth-pass').value; const stored = localStorage.getItem('rsDeletePassword'); if(entered !== stored) return showToast("❌ Incorrect Password", "error"); document.getElementById('delete-auth-modal').style.display = 'none'; showToast("⏳ Deleting data...", "info"); try { if(pendingDeleteType === 'orders' || pendingDeleteType === 'all') await fetch(DB_URL + 'orders.json', { method: 'DELETE' }); if(pendingDeleteType === 'users' || pendingDeleteType === 'all') await fetch(DB_URL + 'users.json', { method: 'DELETE' }); if(pendingDeleteType === 'all') await fetch(DB_URL + 'products.json', { method: 'DELETE' }); showToast("✅ Data wiped successfully!", "success"); fetchData(); } catch(e) { showToast("❌ Error deleting data.", "error"); } }
+
+        function initChart() { const ctx = document.getElementById('salesChart').getContext('2d'); const textColor = document.body.classList.contains('dark-mode') ? '#e4e6ef' : '#888'; salesChartInstance = new Chart(ctx, { type: 'line', data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'Revenue (₹)', data: [0,0,0,0,0,0,0], borderColor: '#c5a880', backgroundColor: 'rgba(197, 168, 128, 0.2)', borderWidth: 3, fill: true, tension: 0.4 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks:{color:textColor}, grid:{display:false} }, y: { ticks:{color:textColor}, grid:{color: 'rgba(200,200,200,0.1)'} } } } }); }
 
         async function fetchData() {
             try {
                 let pRes = await fetch(DB_URL + 'products.json'); let pData = await pRes.json();
                 let pTable = document.getElementById('products-table'); pTable.innerHTML = ''; let productCount = 0;
-                if(pData) {
-                    Object.keys(pData).reverse().forEach(key => {
-                        let p = pData[key]; productCount++; let discountBadge = p.discount ? `<span class="badge badge-danger" style="margin-left:5px;">${p.discount}% OFF</span>` : '';
-                        pTable.innerHTML += `<tr><td><img src="${p.img}" style="width:40px; height:40px; object-fit:cover; border-radius:5px;"></td><td><b>${p.name}</b><br><span style="font-size:11px; color:#888;">Coupon: ${p.coupon || 'None'}</span></td><td>₹${p.price} ${discountBadge}</td><td>${p.stock} units</td><td style="white-space: nowrap;"><button onclick="openEditModal('${key}', ${p.stock}, '${p.status}')" style="color:#3699ff; background:none; border:none; cursor:pointer; margin-right:10px;"><i class="fas fa-edit"></i> Edit</button><button onclick="deleteProduct('${key}')" style="color:red; background:none; border:none; cursor:pointer;"><i class="fas fa-trash"></i> Delete</button></td></tr>`;
-                    });
-                }
+                if(pData) { Object.keys(pData).reverse().forEach(key => { let p = pData[key]; productCount++; let discountBadge = p.discount ? `<span class="badge badge-danger" style="margin-left:5px;">${p.discount}% OFF</span>` : ''; pTable.innerHTML += `<tr><td><img src="${p.img}" style="width:40px; height:40px; object-fit:cover; border-radius:5px;"></td><td><b>${p.name}</b><br><span style="font-size:11px; color:#888;">Mode: ${p.paymentMode||'Both'}</span></td><td>₹${p.price} ${discountBadge}</td><td>${p.stock} units</td><td style="white-space: nowrap;"><button onclick="openEditModal('${key}', ${p.stock}, '${p.status}')" style="color:#3699ff; background:none; border:none; cursor:pointer; margin-right:10px;"><i class="fas fa-edit"></i> Edit</button><button onclick="deleteProduct('${key}')" style="color:red; background:none; border:none; cursor:pointer;"><i class="fas fa-trash"></i> Delete</button></td></tr>`; }); }
                 document.getElementById('dash-products').innerText = productCount;
 
                 let uRes = await fetch(DB_URL + 'users.json'); let uData = await uRes.json();
                 let uTable = document.getElementById('customers-table'); uTable.innerHTML = ''; let custCount = 0;
-                if(uData) {
-                    Object.keys(uData).forEach(key => {
-                        const u = uData[key]; custCount++; const isBanned = u.banned === true; const banBadge = isBanned ? '<span class="badge badge-danger" style="margin-left:8px;">BANNED</span>' : '';
-                        const banAction = isBanned ? `<button onclick="toggleBanUser('${key}', true)" style="color:#1bc5bd; font-weight:bold; background:none; border:none; cursor:pointer;"><i class="fas fa-check-circle"></i> Unban</button>` : `<button onclick="toggleBanUser('${key}', false)" style="color:#f64e60; font-weight:bold; background:none; border:none; cursor:pointer;"><i class="fas fa-ban"></i> Ban</button>`;
-                        uTable.innerHTML += `<tr><td style="font-weight:bold; color:var(--primary);">${u.userId}</td><td>${u.name} ${banBadge}</td><td>${u.phone}</td><td style="display:flex; gap:15px;"><button onclick="viewCustomer('${key}', '${u.userId}', '${u.name}')" class="btn-primary" style="font-size:11px; padding: 5px 10px;"><i class="fas fa-eye"></i> Details</button>${banAction}</td></tr>`;
-                    });
-                }
+                if(uData) { Object.keys(uData).forEach(key => { const u = uData[key]; custCount++; const isBanned = u.banned === true; const banBadge = isBanned ? '<span class="badge badge-danger" style="margin-left:8px;">BANNED</span>' : ''; const banAction = isBanned ? `<button onclick="toggleBanUser('${key}', true)" style="color:#1bc5bd; font-weight:bold; background:none; border:none; cursor:pointer;"><i class="fas fa-check-circle"></i> Unban</button>` : `<button onclick="toggleBanUser('${key}', false)" style="color:#f64e60; font-weight:bold; background:none; border:none; cursor:pointer;"><i class="fas fa-ban"></i> Ban</button>`; uTable.innerHTML += `<tr><td style="font-weight:bold; color:var(--primary);">${u.userId}</td><td>${u.name} ${banBadge}</td><td>${u.phone}</td><td style="display:flex; gap:15px;"><button onclick="viewCustomer('${key}', '${u.userId}', '${u.name}')" class="btn-primary" style="font-size:11px; padding: 5px 10px;"><i class="fas fa-eye"></i> Details</button>${banAction}</td></tr>`; }); }
                 document.getElementById('dash-customers').innerText = custCount;
 
                 let oRes = await fetch(DB_URL + 'orders.json'); let oData = await oRes.json();
-                let oTable = document.getElementById('orders-table'); oTable.innerHTML = '';
-                let totalRev = 0; let pendingOrders = 0; let chartData = [0,0,0,0,0,0,0];
+                let oTable = document.getElementById('orders-table'); oTable.innerHTML = ''; let totalRev = 0; let pendingOrders = 0; let chartData = [0,0,0,0,0,0,0];
                 if(oData) {
                     Object.keys(oData).reverse().forEach((key, index) => {
-                        let o = oData[key];
-                        if(o.status === "Delivered") { totalRev += parseInt(o.totalAmount); chartData[index % 7] += parseInt(o.totalAmount); }
-                        if(o.status === "Pending") pendingOrders++;
-                        let statusColor = o.status === 'Pending' ? '#ffa800' : (o.status === 'Rejected' ? 'red' : '#1bc5bd');
-                        
-                        oTable.innerHTML += `<tr>
-                            <td><b>${o.customerName}</b><br><span style="font-size:11px; color:#888;">${o.phone}</span></td>
-                            <td>${o.items}<br><b style="color:var(--primary);">₹${o.totalAmount}</b></td>
-                            <td><select onchange="updateOrder('${key}', 'status', this.value)" style="padding:5px; border:1px solid ${statusColor}; font-weight:bold; border-radius:4px; background:var(--input-bg); color:var(--text-main); margin-bottom:5px;"><option value="Pending" ${o.status==='Pending'?'selected':''}>Pending</option><option value="Accepted" ${o.status==='Accepted'?'selected':''}>Accepted</option><option value="Shipped" ${o.status==='Shipped'?'selected':''}>Shipped</option><option value="Delivered" ${o.status==='Delivered'?'selected':''}>Delivered</option><option value="Rejected" ${o.status==='Rejected'?'selected':''}>Rejected</option></select></td>
-                            <td>
-                                <button onclick="viewFullOrder('${key}')" class="btn-primary" style="font-size:11px; width:100%; margin-bottom:5px; background:#8950fc;"><i class="fas fa-eye"></i> Show Details</button>
-                                <input type="text" value="${o.deliveryTime || ''}" onblur="updateOrder('${key}', 'deliveryTime', this.value)" style="padding:5px; width:100%; margin-bottom:5px;" placeholder="e.g. In 7 days">
-                                <button onclick="updateOrder('${key}', 'save', '')" class="btn-primary" style="font-size:11px; width:100%;"><i class="fas fa-save"></i> Save</button>
-                            </td></tr>`;
+                        let o = oData[key]; if(o.status === "Delivered") { totalRev += parseInt(o.totalAmount); chartData[index % 7] += parseInt(o.totalAmount); } if(o.status === "Pending") pendingOrders++; let statusColor = o.status === 'Pending' ? '#ffa800' : (o.status === 'Rejected' ? 'red' : '#1bc5bd');
+                        oTable.innerHTML += `<tr><td><b>${o.customerName}</b><br><span style="font-size:11px; color:#888;">${o.phone}</span></td><td>${o.items}<br><b style="color:var(--primary);">₹${o.totalAmount}</b></td><td><select onchange="updateOrder('${key}', 'status', this.value)" style="padding:5px; border:1px solid ${statusColor}; font-weight:bold; border-radius:4px; background:var(--input-bg); color:var(--text-main); margin-bottom:5px;"><option value="Pending" ${o.status==='Pending'?'selected':''}>Pending</option><option value="Accepted" ${o.status==='Accepted'?'selected':''}>Accepted</option><option value="Shipped" ${o.status==='Shipped'?'selected':''}>Shipped</option><option value="Delivered" ${o.status==='Delivered'?'selected':''}>Delivered</option><option value="Rejected" ${o.status==='Rejected'?'selected':''}>Rejected</option></select></td><td><button onclick="viewFullOrder('${key}')" class="btn-primary" style="font-size:11px; width:100%; margin-bottom:5px; background:#8950fc;"><i class="fas fa-eye"></i> Show Details</button><input type="text" value="${o.deliveryTime || ''}" onblur="updateOrder('${key}', 'deliveryTime', this.value)" style="padding:5px; width:100%; margin-bottom:5px;" placeholder="e.g. In 7 days"><button onclick="updateOrder('${key}', 'save', '')" class="btn-primary" style="font-size:11px; width:100%;"><i class="fas fa-save"></i> Save</button></td></tr>`;
                     });
                 }
                 document.getElementById('dash-earnings').innerText = `₹${totalRev.toLocaleString()}`; document.getElementById('dash-pending').innerText = pendingOrders;
@@ -271,67 +219,49 @@
             } catch (e) { console.error(e); }
         }
         async function viewFullOrder(dbKey) {
-            document.getElementById('order-details-modal').style.display = 'flex';
-            document.getElementById('od-content').innerHTML = '<p style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading details...</p>';
+            document.getElementById('order-details-modal').style.display = 'flex'; document.getElementById('od-content').innerHTML = '<p style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading details...</p>';
             try {
-                let res = await fetch(`${DB_URL}orders/${dbKey}.json`); let o = await res.json();
-                let html = `
-                    <div style="background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom:15px; border: 1px solid var(--border-color);">
-                        <h4 style="color:var(--primary); margin-bottom:10px;"><i class="fas fa-user"></i> Customer Info</h4>
-                        <p><b>Name:</b> ${o.customerName}</p><p><b>Phone:</b> <a href="tel:${o.phone}" style="color:#3699ff; text-decoration:none;">${o.phone}</a></p>
-                    </div>
-                    <div style="background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom:15px; border: 1px solid var(--border-color);">
-                        <h4 style="color:var(--primary); margin-bottom:10px;"><i class="fas fa-map-marker-alt"></i> Delivery Address</h4>
-                        <p>${o.address}</p>
-                    </div>
-                    <div style="background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom:15px; border: 1px solid var(--border-color);">
-                        <h4 style="color:var(--primary); margin-bottom:10px;"><i class="fas fa-shopping-bag"></i> Order Summary</h4>
-                        <p><b>Items:</b> ${o.items}</p><p><b>Total Amount:</b> ₹${o.totalAmount}</p><p><b>Payment Mode:</b> <span class="badge" style="background:#333; color:white;">${o.paymentType || 'COD'}</span></p>
-                    </div>`;
-                if(o.paymentType === 'UPI' && o.upiScreenshot) {
-                    html += `<div style="background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom:15px; border: 1px solid var(--border-color); text-align:center;"><h4 style="color:#6528F7; margin-bottom:10px;"><i class="fas fa-receipt"></i> Payment Screenshot</h4><img src="${o.upiScreenshot}" style="width:100%; max-width:250px; border-radius:8px; border:2px solid #ddd; cursor:pointer;" onclick="window.open(this.src)"></div>`;
-                }
+                let res = await fetch(`${DB_URL}orders/${dbKey}.json`); let o = await res.json(); let imagesHtml = '';
+                try { 
+                    let pRes = await fetch(DB_URL + 'products.json'); let pData = await pRes.json(); 
+                    if(pData) { 
+                        // FIXED IMAGE MATCHER: Removes [Coupon...] from the string before checking!
+                        let rawItemsString = o.items.replace(/\[.*?\]/g, ''); 
+                        let itemNames = rawItemsString.split(',').map(s => s.trim().toLowerCase()); 
+                        let matchedProducts = []; 
+                        Object.keys(pData).forEach(k => { if(itemNames.includes(pData[k].name.toLowerCase())) matchedProducts.push(pData[k]); }); 
+                        
+                        if(matchedProducts.length > 0) { 
+                            imagesHtml = `<div style="display:flex; gap:10px; margin-top:10px; overflow-x:auto; padding-bottom:5px;">`; 
+                            matchedProducts.forEach(p => { imagesHtml += `<div style="text-align:center; min-width:70px;"><a href="${p.img}" target="_blank" title="Click to view full image"><img src="${p.img}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; border:2px solid var(--primary);"></a><p style="font-size:10px; font-weight:bold; margin-top:4px; max-width:70px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${p.name}</p></div>`; }); 
+                            imagesHtml += `</div><p style="font-size:10px; color:#888; margin-bottom:10px;"><i>*Click image to view full size</i></p>`; 
+                        } 
+                    } 
+                } catch(e) {}
+                
+                let html = `<div style="background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom:15px; border: 1px solid var(--border-color);"><h4 style="color:var(--primary); margin-bottom:10px;"><i class="fas fa-user"></i> Customer Info</h4><p><b>Name:</b> ${o.customerName}</p><p><b>Phone:</b> <a href="tel:${o.phone}" style="color:#3699ff; text-decoration:none;">${o.phone}</a></p></div><div style="background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom:15px; border: 1px solid var(--border-color);"><h4 style="color:var(--primary); margin-bottom:10px;"><i class="fas fa-map-marker-alt"></i> Delivery Address</h4><p>${o.address}</p></div><div style="background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom:15px; border: 1px solid var(--border-color);"><h4 style="color:var(--primary); margin-bottom:10px;"><i class="fas fa-shopping-bag"></i> Order Summary</h4><p><b>Items:</b> ${o.items}</p>${imagesHtml}<p style="margin-top:10px;"><b>Total Amount:</b> ₹${o.totalAmount}</p><p><b>Payment Mode:</b> <span class="badge" style="background:#333; color:white;">${o.paymentType || 'COD'}</span></p></div>`;
+                if(o.paymentType === 'UPI' && o.upiScreenshot) { html += `<div style="background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom:15px; border: 1px solid var(--border-color); text-align:center;"><h4 style="color:#6528F7; margin-bottom:10px;"><i class="fas fa-receipt"></i> Payment Screenshot</h4><img src="${o.upiScreenshot}" style="width:100%; max-width:250px; border-radius:8px; border:2px solid #ddd; cursor:pointer;" onclick="window.open(this.src)"></div>`; }
+                
+                // NEW: 1-CLICK ACCEPT BUTTON
+                let acceptBtnHtml = (o.status !== 'Accepted' && o.status !== 'Shipped' && o.status !== 'Delivered') ? `<button onclick="acceptOrderFromModal('${dbKey}')" style="width:100%; padding:15px; margin-top:15px; background:#1bc5bd; color:white; border:none; border-radius:8px; font-weight:bold; font-size:16px; cursor:pointer;"><i class="fas fa-check-circle"></i> Accept Order</button>` : '';
+                html += acceptBtnHtml;
+                
                 document.getElementById('od-content').innerHTML = html;
             } catch(e) { document.getElementById('od-content').innerHTML = '<p style="color:red;">Error loading data.</p>'; }
         }
 
-        async function viewCustomer(dbKey, userId, name) {
-            document.getElementById('cd-name').innerText = name + "'s Profile"; document.getElementById('customer-details-modal').style.display = 'flex';
-            try {
-                let uRes = await fetch(`${DB_URL}users/${dbKey}.json`); let uData = await uRes.json();
-                document.getElementById('cd-cart').innerHTML = (uData.cart && uData.cart.length > 0) ? uData.cart.map(item => `<div style="padding: 8px 0; border-bottom: 1px solid var(--border-color); display:flex; align-items:center;"><img src="${item.img}" style="width:35px; height:35px; object-fit:cover; border-radius:4px; margin-right:10px;"> <b>${item.name}</b><span style="margin-left:auto; font-weight:bold;">₹${item.price}</span></div>`).join('') : '<span style="color:#888;">Cart is empty.</span>';
-                document.getElementById('cd-searches').innerHTML = (uData.searches && uData.searches.length > 0) ? uData.searches.map(s => `<span style="background: var(--primary); color: white; padding: 4px 10px; border-radius: 15px; font-size: 12px;">${s}</span>`).join('') : '<span style="color:#888;">No recent searches.</span>';
-                let oRes = await fetch(DB_URL + 'orders.json'); let oData = await oRes.json(); let userOrders = [];
-                if(oData) { Object.keys(oData).forEach(k => { if(oData[k].userId === userId) userOrders.push(oData[k]); }); }
-                document.getElementById('cd-orders').innerHTML = userOrders.length > 0 ? userOrders.reverse().map(o => `<div style="border-bottom:1px solid var(--border-color); padding-bottom:10px; margin-bottom:10px;"><div style="display:flex; justify-content:space-between;"><b>${o.items}</b> <span style="color:var(--primary); font-weight:bold;">${o.status}</span></div><div style="color:#888; font-size:12px; margin-top:4px;">Total: ₹${o.totalAmount} | Delivery: ${o.deliveryTime}</div></div>`).join('') : '<span style="color:#888;">No orders yet.</span>';
-            } catch(e) {}
-        }
+        async function acceptOrderFromModal(id) { await updateOrder(id, 'status', 'Accepted'); document.getElementById('order-details-modal').style.display = 'none'; fetchData(); }
 
+        async function viewCustomer(dbKey, userId, name) { document.getElementById('cd-name').innerText = name + "'s Profile"; document.getElementById('customer-details-modal').style.display = 'flex'; try { let uRes = await fetch(`${DB_URL}users/${dbKey}.json`); let uData = await uRes.json(); document.getElementById('cd-cart').innerHTML = (uData.cart && uData.cart.length > 0) ? uData.cart.map(item => `<div style="padding: 8px 0; border-bottom: 1px solid var(--border-color); display:flex; align-items:center;"><img src="${item.img}" style="width:35px; height:35px; object-fit:cover; border-radius:4px; margin-right:10px;"> <b>${item.name}</b><span style="margin-left:auto; font-weight:bold;">₹${item.price}</span></div>`).join('') : '<span style="color:#888;">Cart is empty.</span>'; document.getElementById('cd-searches').innerHTML = (uData.searches && uData.searches.length > 0) ? uData.searches.map(s => `<span style="background: var(--primary); color: white; padding: 4px 10px; border-radius: 15px; font-size: 12px;">${s}</span>`).join('') : '<span style="color:#888;">No recent searches.</span>'; let oRes = await fetch(DB_URL + 'orders.json'); let oData = await oRes.json(); let userOrders = []; if(oData) { Object.keys(oData).forEach(k => { if(oData[k].userId === userId) userOrders.push(oData[k]); }); } document.getElementById('cd-orders').innerHTML = userOrders.length > 0 ? userOrders.reverse().map(o => `<div style="border-bottom:1px solid var(--border-color); padding-bottom:10px; margin-bottom:10px;"><div style="display:flex; justify-content:space-between;"><b>${o.items}</b> <span style="color:var(--primary); font-weight:bold;">${o.status}</span></div><div style="color:#888; font-size:12px; margin-top:4px;">Total: ₹${o.totalAmount} | Delivery: ${o.deliveryTime}</div></div>`).join('') : '<span style="color:#888;">No orders yet.</span>'; } catch(e) {} }
         function toggleBanUser(dbKey, currentlyBanned) { customConfirm(`Confirm action?`, async () => { await fetch(`${DB_URL}users/${dbKey}.json`, { method: 'PATCH', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ banned: !currentlyBanned }) }); fetchData(); showToast(`✅ User ${currentlyBanned ? 'unbanned' : 'banned'} successfully!`, 'success'); }); }
         function deleteProduct(id) { customConfirm("Delete this product?", async () => { await fetch(DB_URL + 'products/' + id + '.json', { method: 'DELETE' }); fetchData(); showToast("🗑️ Product deleted!", 'info'); }); }
         function openEditModal(id, stock, status) { document.getElementById('edit-id').value = id; document.getElementById('edit-stock').value = stock; document.getElementById('edit-status').value = status; document.getElementById('edit-modal').style.display = 'flex'; }
         async function saveProductEdit() { const id = document.getElementById('edit-id').value; document.getElementById('save-edit-btn').innerHTML = "Updating..."; await fetch(`${DB_URL}products/${id}.json`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stock: document.getElementById('edit-stock').value, status: document.getElementById('edit-status').value }) }); document.getElementById('edit-modal').style.display = 'none'; fetchData(); document.getElementById('save-edit-btn').innerHTML = "Update"; showToast("✅ Inventory Updated!", "success"); }
         async function updateOrder(id, field, value) { if(field === 'save') return showToast("🚚 Order status updated!", "success"); let data = {}; data[field] = value; await fetch(DB_URL + 'orders/' + id + '.json', { method: 'PATCH', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) }); }
-
-        async function processMultipleImages(event) {
-            const files = Array.from(event.target.files).slice(0, 4); if(files.length === 0) return;
-            uploadedImagesBase64 = []; const previewContainer = document.getElementById('multi-image-preview'); previewContainer.innerHTML = '<p style="color:var(--primary);"><i class="fas fa-spinner fa-spin"></i> Processing images...</p>';
-            try {
-                uploadedImagesBase64 = await Promise.all(files.map(file => resizeImage(file)));
-                previewContainer.innerHTML = uploadedImagesBase64.map((url, i) => `<img src="${url}" style="width:75px; height:75px; object-fit:cover; border-radius:5px; border: ${i===0?'3px solid var(--primary)':'1px solid var(--border-color)'};">`).join('');
-                showToast(`✅ ${uploadedImagesBase64.length} images processed!`, 'success');
-            } catch(e) { showToast("⚠️ Error processing images.", 'error'); previewContainer.innerHTML = ''; }
-        }
-
+        async function processMultipleImages(event) { const files = Array.from(event.target.files).slice(0, 4); if(files.length === 0) return; uploadedImagesBase64 = []; const previewContainer = document.getElementById('multi-image-preview'); previewContainer.innerHTML = '<p style="color:var(--primary);"><i class="fas fa-spinner fa-spin"></i> Processing images...</p>'; try { uploadedImagesBase64 = await Promise.all(files.map(file => resizeImage(file))); previewContainer.innerHTML = uploadedImagesBase64.map((url, i) => `<img src="${url}" style="width:75px; height:75px; object-fit:cover; border-radius:5px; border: ${i===0?'3px solid var(--primary)':'1px solid var(--border-color)'};">`).join(''); showToast(`✅ ${uploadedImagesBase64.length} images processed!`, 'success'); } catch(e) { showToast("⚠️ Error processing images.", 'error'); previewContainer.innerHTML = ''; } }
         function resizeImage(file) { return new Promise((resolve) => { const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const scale = 500 / img.width; canvas.width = 500; canvas.height = img.height * scale; canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height); resolve(canvas.toDataURL('image/jpeg', 0.7)); }; img.src = e.target.result; }; reader.readAsDataURL(file); }); }
 
-        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
-            e.preventDefault(); if(uploadedImagesBase64.length === 0) return showToast("⚠️ Please select at least 1 image!", "error");
-            const btn = document.getElementById('submitBtn'); btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Uploading..."; btn.disabled = true;
-            const productData = { name: document.getElementById('p_name').value, price: parseInt(document.getElementById('p_price').value), discount: document.getElementById('p_discount').value || 0, coupon: document.getElementById('p_coupon').value || "", category: document.getElementById('p_category').value, stock: parseInt(document.getElementById('p_stock').value), status: document.getElementById('p_status').value, img: uploadedImagesBase64[0], gallery: uploadedImagesBase64 };
-            try { await fetch(DB_URL + 'products.json', { method: 'POST', body: JSON.stringify(productData) }); showToast("🎉 Product Published Successfully!", "success"); document.getElementById('uploadForm').reset(); document.getElementById('multi-image-preview').innerHTML = ''; uploadedImagesBase64 = []; fetchData(); } catch (err) { showToast("❌ Failed to upload.", "error"); }
-            btn.innerHTML = "Publish to Live Website"; btn.disabled = false;
-        });
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) { e.preventDefault(); if(uploadedImagesBase64.length === 0) return showToast("⚠️ Please select at least 1 image!", "error"); const btn = document.getElementById('submitBtn'); btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Uploading..."; btn.disabled = true; const productData = { name: document.getElementById('p_name').value, price: parseInt(document.getElementById('p_price').value), discount: document.getElementById('p_discount').value || 0, coupon: document.getElementById('p_coupon').value || "", paymentMode: document.getElementById('p_paymentMode').value, stock: parseInt(document.getElementById('p_stock').value), status: document.getElementById('p_status').value, img: uploadedImagesBase64[0], gallery: uploadedImagesBase64 }; try { await fetch(DB_URL + 'products.json', { method: 'POST', body: JSON.stringify(productData) }); showToast("🎉 Product Published Successfully!", "success"); document.getElementById('uploadForm').reset(); document.getElementById('multi-image-preview').innerHTML = ''; uploadedImagesBase64 = []; fetchData(); } catch (err) { showToast("❌ Failed to upload.", "error"); } btn.innerHTML = "Publish to Live Website"; btn.disabled = false; });
     </script>
 </body>
 </html>
