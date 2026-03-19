@@ -21,7 +21,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Jost', sans-serif; }
         body { display: flex; background-color: var(--bg-color); color: var(--text-main); height: 100vh; overflow: hidden; transition: 0.3s; }
         #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1e1e2d; display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .auth-box { background: #ffffff; padding: 40px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .auth-box { background: var(--card-bg); padding: 40px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .auth-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--input-bg); color: var(--text-main); }
         .auth-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .auth-switch { margin-top: 15px; font-size: 13px; color: #888; cursor: pointer; text-decoration: underline; }
@@ -108,6 +108,7 @@
             </div>
             <div class="card"><div class="card-header"><h3>Revenue Analytics</h3></div><div style="padding: 20px;"><canvas id="salesChart" height="80"></canvas></div></div>
         </div>
+
         <div id="products-view" class="view-section">
             <div class="card">
                 <div class="card-header"><h3>Live Inventory</h3><button class="btn-primary" onclick="fetchData()"><i class="fas fa-sync"></i> Refresh</button></div>
@@ -166,11 +167,11 @@
             </div>
         </div>
     </div>
+
     <div class="modal-overlay" id="order-details-modal"><div class="modal-content" style="max-width: 500px;"><div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px;"><h2 style="font-family: 'Playfair Display', serif; color: var(--primary);">📦 Shipping Details</h2><button onclick="document.getElementById('order-details-modal').style.display='none'" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #f64e60;"><i class="fas fa-times-circle"></i></button></div><div id="od-content" style="font-size: 15px; line-height: 1.6;">Loading...</div></div></div>
     <div class="modal-overlay" id="confirm-modal"><div class="modal-content" style="max-width: 350px; text-align: center;"><div style="font-size: 40px; margin-bottom: 15px;">🤔</div><h3 id="confirm-msg" style="margin-bottom: 20px;">Are you sure?</h3><div style="display: flex; gap: 10px;"><button class="btn-primary" style="background: #ccc; flex: 1;" onclick="document.getElementById('confirm-modal').style.display='none'">Cancel</button><button class="btn-primary" style="background: #f64e60; flex: 1;" id="confirm-yes-btn">Yes, proceed</button></div></div></div>
     <div class="modal-overlay" id="customer-details-modal"><div class="modal-content"><div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px;"><h2 id="cd-name" style="font-family: 'Playfair Display', serif; color: var(--primary);">Customer Profile</h2><button onclick="document.getElementById('customer-details-modal').style.display='none'" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #f64e60;"><i class="fas fa-times-circle"></i></button></div><h4 style="margin-bottom: 10px;"><i class="fas fa-shopping-cart" style="color: var(--primary);"></i> Items in Cart</h4><div id="cd-cart" class="crm-box">Loading...</div><h4 style="margin-bottom: 10px;"><i class="fas fa-search" style="color: var(--primary);"></i> Recent Searches</h4><div id="cd-searches" class="crm-box" style="display: flex; flex-wrap: wrap; gap: 8px;">Loading...</div><h4 style="margin-bottom: 10px;"><i class="fas fa-box-open" style="color: var(--primary);"></i> Past Orders</h4><div id="cd-orders" class="crm-box">Loading...</div></div></div>
     <div class="modal-overlay" id="edit-modal"><div class="modal-content" style="max-width: 400px;"><h3 style="margin-bottom: 20px;">Update Inventory</h3><input type="hidden" id="edit-id"><div class="form-group"><label>Stock Quantity</label><input type="number" id="edit-stock"></div><div class="form-group"><label>Product Status</label><select id="edit-status"><option value="Active">In Stock (Active)</option><option value="Out of Stock">Out of Stock</option></select></div><div style="display: flex; gap: 10px; margin-top: 20px;"><button class="btn-primary" style="background: #ccc; flex: 1;" onclick="document.getElementById('edit-modal').style.display='none'">Cancel</button><button class="btn-primary" style="flex: 1;" id="save-edit-btn" onclick="saveProductEdit()">Update</button></div></div></div>
-
     <script>
         const DB_URL = "https://leon-41242-default-rtdb.firebaseio.com/";
         let uploadedImagesBase64 = []; let salesChartInstance = null;
@@ -186,7 +187,6 @@
 
         window.onload = () => {
             if (localStorage.getItem('rsAdminLoggedIn') === 'true') {
-                document.getElementById('auth-screen').style.display = 'none'; document.getElementById('main-app').style.display = 'flex';
                 document.getElementById('display-admin-name').innerText = localStorage.getItem('rsAdminUser');
                 loadProfileData(); initChart(); fetchData();
             }
@@ -217,11 +217,11 @@
         function loadProfileData() { const savedData = JSON.parse(localStorage.getItem('rsAdminCredentials')); if(savedData && savedData.username) { document.getElementById('set-username').value = savedData.username; if (savedData.profilePic) document.getElementById('settings-avatar-preview').src = savedData.profilePic; } }
         function updateProfilePic(event) { const file = event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = function(e) { const savedData = JSON.parse(localStorage.getItem('rsAdminCredentials')) || {}; savedData.profilePic = e.target.result; localStorage.setItem('rsAdminCredentials', JSON.stringify(savedData)); loadProfileData(); showToast("📷 Profile Picture Updated!", "success"); }; reader.readAsDataURL(file); } }
         function switchTab(tabId, el) { document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active')); document.getElementById(tabId).classList.add('active'); document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); document.getElementById('header-title').innerText = el.innerText; if(window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open'); }
+
         function initChart() {
             const ctx = document.getElementById('salesChart').getContext('2d'); const textColor = document.body.classList.contains('dark-mode') ? '#e4e6ef' : '#888';
             salesChartInstance = new Chart(ctx, { type: 'line', data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'Revenue (₹)', data: [0,0,0,0,0,0,0], borderColor: '#c5a880', backgroundColor: 'rgba(197, 168, 128, 0.2)', borderWidth: 3, fill: true, tension: 0.4 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks:{color:textColor}, grid:{display:false} }, y: { ticks:{color:textColor}, grid:{color: 'rgba(200,200,200,0.1)'} } } } });
         }
-
         async function fetchData() {
             try {
                 let pRes = await fetch(DB_URL + 'products.json'); let pData = await pRes.json();
@@ -270,11 +270,38 @@
                 if(salesChartInstance) { salesChartInstance.data.datasets[0].data = chartData; salesChartInstance.update(); }
             } catch (e) { console.error(e); }
         }
+
+        // --- NEW: FETCH ORDER WITH PRODUCT IMAGES ---
         async function viewFullOrder(dbKey) {
             document.getElementById('order-details-modal').style.display = 'flex';
             document.getElementById('od-content').innerHTML = '<p style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading details...</p>';
             try {
                 let res = await fetch(`${DB_URL}orders/${dbKey}.json`); let o = await res.json();
+                
+                // Smart Image Matching
+                let imagesHtml = '';
+                try {
+                    let pRes = await fetch(DB_URL + 'products.json'); let pData = await pRes.json();
+                    if(pData) {
+                        let itemNames = o.items.split(',').map(s => s.trim().toLowerCase());
+                        let matchedProducts = [];
+                        Object.keys(pData).forEach(k => { if(itemNames.includes(pData[k].name.toLowerCase())) matchedProducts.push(pData[k]); });
+                        
+                        if(matchedProducts.length > 0) {
+                            imagesHtml = `<div style="display:flex; gap:10px; margin-top:10px; overflow-x:auto; padding-bottom:5px;">`;
+                            matchedProducts.forEach(p => {
+                                imagesHtml += `<div style="text-align:center; min-width:70px;">
+                                    <a href="${p.img}" target="_blank" title="Click to view full image">
+                                        <img src="${p.img}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; border:2px solid var(--primary);">
+                                    </a>
+                                    <p style="font-size:10px; font-weight:bold; margin-top:4px; max-width:70px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${p.name}</p>
+                                </div>`;
+                            });
+                            imagesHtml += `</div><p style="font-size:10px; color:#888; margin-bottom:10px;"><i>*Click image to view full size</i></p>`;
+                        }
+                    }
+                } catch(e) { console.log(e); }
+
                 let html = `
                     <div style="background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom:15px; border: 1px solid var(--border-color);">
                         <h4 style="color:var(--primary); margin-bottom:10px;"><i class="fas fa-user"></i> Customer Info</h4>
@@ -286,7 +313,9 @@
                     </div>
                     <div style="background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom:15px; border: 1px solid var(--border-color);">
                         <h4 style="color:var(--primary); margin-bottom:10px;"><i class="fas fa-shopping-bag"></i> Order Summary</h4>
-                        <p><b>Items:</b> ${o.items}</p><p><b>Total Amount:</b> ₹${o.totalAmount}</p><p><b>Payment Mode:</b> <span class="badge" style="background:#333; color:white;">${o.paymentType || 'COD'}</span></p>
+                        <p><b>Items:</b> ${o.items}</p>
+                        ${imagesHtml}
+                        <p style="margin-top:10px;"><b>Total Amount:</b> ₹${o.totalAmount}</p><p><b>Payment Mode:</b> <span class="badge" style="background:#333; color:white;">${o.paymentType || 'COD'}</span></p>
                     </div>`;
                 if(o.paymentType === 'UPI' && o.upiScreenshot) {
                     html += `<div style="background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom:15px; border: 1px solid var(--border-color); text-align:center;"><h4 style="color:#6528F7; margin-bottom:10px;"><i class="fas fa-receipt"></i> Payment Screenshot</h4><img src="${o.upiScreenshot}" style="width:100%; max-width:250px; border-radius:8px; border:2px solid #ddd; cursor:pointer;" onclick="window.open(this.src)"></div>`;
@@ -295,34 +324,14 @@
             } catch(e) { document.getElementById('od-content').innerHTML = '<p style="color:red;">Error loading data.</p>'; }
         }
 
-        async function viewCustomer(dbKey, userId, name) {
-            document.getElementById('cd-name').innerText = name + "'s Profile"; document.getElementById('customer-details-modal').style.display = 'flex';
-            try {
-                let uRes = await fetch(`${DB_URL}users/${dbKey}.json`); let uData = await uRes.json();
-                document.getElementById('cd-cart').innerHTML = (uData.cart && uData.cart.length > 0) ? uData.cart.map(item => `<div style="padding: 8px 0; border-bottom: 1px solid var(--border-color); display:flex; align-items:center;"><img src="${item.img}" style="width:35px; height:35px; object-fit:cover; border-radius:4px; margin-right:10px;"> <b>${item.name}</b><span style="margin-left:auto; font-weight:bold;">₹${item.price}</span></div>`).join('') : '<span style="color:#888;">Cart is empty.</span>';
-                document.getElementById('cd-searches').innerHTML = (uData.searches && uData.searches.length > 0) ? uData.searches.map(s => `<span style="background: var(--primary); color: white; padding: 4px 10px; border-radius: 15px; font-size: 12px;">${s}</span>`).join('') : '<span style="color:#888;">No recent searches.</span>';
-                let oRes = await fetch(DB_URL + 'orders.json'); let oData = await oRes.json(); let userOrders = [];
-                if(oData) { Object.keys(oData).forEach(k => { if(oData[k].userId === userId) userOrders.push(oData[k]); }); }
-                document.getElementById('cd-orders').innerHTML = userOrders.length > 0 ? userOrders.reverse().map(o => `<div style="border-bottom:1px solid var(--border-color); padding-bottom:10px; margin-bottom:10px;"><div style="display:flex; justify-content:space-between;"><b>${o.items}</b> <span style="color:var(--primary); font-weight:bold;">${o.status}</span></div><div style="color:#888; font-size:12px; margin-top:4px;">Total: ₹${o.totalAmount} | Delivery: ${o.deliveryTime}</div></div>`).join('') : '<span style="color:#888;">No orders yet.</span>';
-            } catch(e) {}
-        }
-
+        async function viewCustomer(dbKey, userId, name) { document.getElementById('cd-name').innerText = name + "'s Profile"; document.getElementById('customer-details-modal').style.display = 'flex'; try { let uRes = await fetch(`${DB_URL}users/${dbKey}.json`); let uData = await uRes.json(); document.getElementById('cd-cart').innerHTML = (uData.cart && uData.cart.length > 0) ? uData.cart.map(item => `<div style="padding: 8px 0; border-bottom: 1px solid var(--border-color); display:flex; align-items:center;"><img src="${item.img}" style="width:35px; height:35px; object-fit:cover; border-radius:4px; margin-right:10px;"> <b>${item.name}</b><span style="margin-left:auto; font-weight:bold;">₹${item.price}</span></div>`).join('') : '<span style="color:#888;">Cart is empty.</span>'; document.getElementById('cd-searches').innerHTML = (uData.searches && uData.searches.length > 0) ? uData.searches.map(s => `<span style="background: var(--primary); color: white; padding: 4px 10px; border-radius: 15px; font-size: 12px;">${s}</span>`).join('') : '<span style="color:#888;">No recent searches.</span>'; let oRes = await fetch(DB_URL + 'orders.json'); let oData = await oRes.json(); let userOrders = []; if(oData) { Object.keys(oData).forEach(k => { if(oData[k].userId === userId) userOrders.push(oData[k]); }); } document.getElementById('cd-orders').innerHTML = userOrders.length > 0 ? userOrders.reverse().map(o => `<div style="border-bottom:1px solid var(--border-color); padding-bottom:10px; margin-bottom:10px;"><div style="display:flex; justify-content:space-between;"><b>${o.items}</b> <span style="color:var(--primary); font-weight:bold;">${o.status}</span></div><div style="color:#888; font-size:12px; margin-top:4px;">Total: ₹${o.totalAmount} | Delivery: ${o.deliveryTime}</div></div>`).join('') : '<span style="color:#888;">No orders yet.</span>'; } catch(e) {} }
         function toggleBanUser(dbKey, currentlyBanned) { customConfirm(`Confirm action?`, async () => { await fetch(`${DB_URL}users/${dbKey}.json`, { method: 'PATCH', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ banned: !currentlyBanned }) }); fetchData(); showToast(`✅ User ${currentlyBanned ? 'unbanned' : 'banned'} successfully!`, 'success'); }); }
         function deleteProduct(id) { customConfirm("Delete this product?", async () => { await fetch(DB_URL + 'products/' + id + '.json', { method: 'DELETE' }); fetchData(); showToast("🗑️ Product deleted!", 'info'); }); }
         function openEditModal(id, stock, status) { document.getElementById('edit-id').value = id; document.getElementById('edit-stock').value = stock; document.getElementById('edit-status').value = status; document.getElementById('edit-modal').style.display = 'flex'; }
         async function saveProductEdit() { const id = document.getElementById('edit-id').value; document.getElementById('save-edit-btn').innerHTML = "Updating..."; await fetch(`${DB_URL}products/${id}.json`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stock: document.getElementById('edit-stock').value, status: document.getElementById('edit-status').value }) }); document.getElementById('edit-modal').style.display = 'none'; fetchData(); document.getElementById('save-edit-btn').innerHTML = "Update"; showToast("✅ Inventory Updated!", "success"); }
         async function updateOrder(id, field, value) { if(field === 'save') return showToast("🚚 Order status updated!", "success"); let data = {}; data[field] = value; await fetch(DB_URL + 'orders/' + id + '.json', { method: 'PATCH', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) }); }
 
-        async function processMultipleImages(event) {
-            const files = Array.from(event.target.files).slice(0, 4); if(files.length === 0) return;
-            uploadedImagesBase64 = []; const previewContainer = document.getElementById('multi-image-preview'); previewContainer.innerHTML = '<p style="color:var(--primary);"><i class="fas fa-spinner fa-spin"></i> Processing images...</p>';
-            try {
-                uploadedImagesBase64 = await Promise.all(files.map(file => resizeImage(file)));
-                previewContainer.innerHTML = uploadedImagesBase64.map((url, i) => `<img src="${url}" style="width:75px; height:75px; object-fit:cover; border-radius:5px; border: ${i===0?'3px solid var(--primary)':'1px solid var(--border-color)'};">`).join('');
-                showToast(`✅ ${uploadedImagesBase64.length} images processed!`, 'success');
-            } catch(e) { showToast("⚠️ Error processing images.", 'error'); previewContainer.innerHTML = ''; }
-        }
-
+        async function processMultipleImages(event) { const files = Array.from(event.target.files).slice(0, 4); if(files.length === 0) return; uploadedImagesBase64 = []; const previewContainer = document.getElementById('multi-image-preview'); previewContainer.innerHTML = '<p style="color:var(--primary);"><i class="fas fa-spinner fa-spin"></i> Processing images...</p>'; try { uploadedImagesBase64 = await Promise.all(files.map(file => resizeImage(file))); previewContainer.innerHTML = uploadedImagesBase64.map((url, i) => `<img src="${url}" style="width:75px; height:75px; object-fit:cover; border-radius:5px; border: ${i===0?'3px solid var(--primary)':'1px solid var(--border-color)'};">`).join(''); showToast(`✅ ${uploadedImagesBase64.length} images processed!`, 'success'); } catch(e) { showToast("⚠️ Error processing images.", 'error'); previewContainer.innerHTML = ''; } }
         function resizeImage(file) { return new Promise((resolve) => { const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const scale = 500 / img.width; canvas.width = 500; canvas.height = img.height * scale; canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height); resolve(canvas.toDataURL('image/jpeg', 0.7)); }; img.src = e.target.result; }; reader.readAsDataURL(file); }); }
 
         document.getElementById('uploadForm').addEventListener('submit', async function(e) {
