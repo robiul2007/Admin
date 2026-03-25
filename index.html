@@ -15,8 +15,24 @@
     <style>
         :root { --sidebar-bg: #1e1e2d; --primary: #c5a880; --bg-color: #CCD4E1; --card-bg: #ffffff; --text-main: #3f4254; --border-color: #eee; --input-bg: #fbfbfb; }
         body.dark-mode { --sidebar-bg: #11111a; --bg-color: #343442; --card-bg: #1e1e2d; --text-main: #e4e6ef; --border-color: #2b2b40; --input-bg: #1b1b29; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Jost', sans-serif; }
-        body { display: flex; background-color: var(--bg-color); color: var(--text-main); height: 100vh; overflow: hidden; transition: 0.3s; }
+* { 
+  margin: 0; 
+  padding: 0; 
+  box-sizing: border-box; 
+  font-family: 'Jost', sans-serif; 
+  transition: background 0.4s ease, color 0.4s ease, transform 0.2s ease; 
+  -webkit-tap-highlight-color: transparent; 
+}
+
+/* ✨ Beautiful "Squish" Click Animation for Admin Panel */
+button:active, 
+.nav-item:active, 
+.sidebar-brand:active, 
+.card:active {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
         
         #auth-screen { position: fixed; inset: 0; background: #1e1e2d; display: flex; align-items: center; justify-content: center; z-index: 1000; }
         .auth-box { background: var(--card-bg); padding: 40px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
