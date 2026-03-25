@@ -17,42 +17,17 @@
         
         
         
-        
-        
-        
-        body.dark-mode  { --sidebar-bg: #1e1e2d; --primary: #c5a880; --bg-color: #CCD4E1; --card-bg: #ffffff; --text-main: #3f4254; --border-color: #eee; --input-bg: #fbfbfb; }
-        
-        
-        
-        
+        body.dark-mode { --sidebar-bg: #1e1e2d; --primary: #c5a880; --bg-color: #CCD4E1; --card-bg: #ffffff; --text-main: #3f4254; --border-color: #eee; --input-bg: #fbfbfb; }
         
         
         
 
-        
-        
-        
-        
-        
-* { 
-  margin: 0; 
-  padding: 0; 
-  box-sizing: border-box; 
-  font-family: 'Jost', sans-serif; 
-  transition: background 0.4s ease, color 0.4s ease, transform 0.1s ease; 
-  -webkit-tap-highlight-color: transparent; 
-}
 
-/* ✨ Softer, Premium "Squish" Animation */
-button:active, 
-.nav-item:active {
-  transform: scale(0.98);
-  opacity: 0.9;
-}
-
-        
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Jost', sans-serif; }
         body { display: flex; background-color: var(--bg-color); color: var(--text-main); height: 100vh; overflow: hidden; transition: 0.3s; }
+        
+        
+        
         
         #auth-screen { position: fixed; inset: 0; background: #1e1e2d; display: flex; align-items: center; justify-content: center; z-index: 1000; }
         .auth-box { background: var(--card-bg); padding: 40px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
@@ -113,14 +88,26 @@ button:active,
     </style>
 </head>
 <body>
-    <div id="auth-screen">
+
+
+
+      <div id="auth-screen">
         <div class="auth-box" id="login-box">
             <h2 style="font-family: 'Playfair Display'; margin-bottom: 20px; color: var(--text-main);">RS Admin Login</h2>
             <input type="text" id="login-user" class="auth-input" placeholder="Admin Username">
             <input type="password" id="login-pass" class="auth-input" placeholder="Password">
-            <button class="auth-btn" onclick="handleAuth('login')">Secure Login</button>
+            <button class="auth-btn" onclick="handleAuth('login', this)">Secure Login</button>
+            <p style="margin-top: 15px; font-size: 13px; color: #888; cursor: pointer;" onclick="toggleAuthMode('register')">New Admin? Create Account</p>
+        </div>
+        <div class="auth-box" id="register-box" style="display: none;">
+            <h2 style="font-family: 'Playfair Display'; margin-bottom: 20px; color: var(--text-main);">Admin Registration</h2>
+            <input type="text" id="register-user" class="auth-input" placeholder="Choose Username">
+            <input type="password" id="register-pass" class="auth-input" placeholder="Choose Password">
+            <button class="auth-btn" onclick="handleAuth('register', this)">Create Account</button>
+            <p style="margin-top: 15px; font-size: 13px; color: #888; cursor: pointer;" onclick="toggleAuthMode('login')">Already have an account? Login</p>
         </div>
     </div>
+
 
     <div class="sidebar" id="sidebar">
         <div class="sidebar-brand">RS ADMIN</div>
@@ -209,8 +196,8 @@ button:active,
                 </form>
             </div>
         </div>
-        <div id="orders-view" class="view-section"><div class="card"><div class="card-header"><h3>Order Management Center</h3><button class="btn-primary" onclick="fetchData()">Refresh</button></div><div style="overflow-x: auto;"><table><thead><tr><th>Customer Info</th><th>Items & Total</th><th>Status</th><th>Actions & Delivery</th></tr></thead><tbody id="orders-table"></tbody></table></div></div></div>
-        <div id="customers-view" class="view-section"><div class="card"><div class="card-header"><h3>Registered Customers</h3><button class="btn-primary" onclick="fetchData()">Refresh</button></div><div style="overflow-x: auto;"><table><thead><tr><th>User ID</th><th>Name</th><th>Phone</th><th>Account Actions</th></tr></thead><tbody id="customers-table"></tbody></table></div></div></div>
+        <div id="orders-view" class="view-section"><div class="card"><div class="card-header"><h3>Order Management</h3><button class="btn-primary" onclick="fetchData()">Refresh</button></div><div style="overflow-x: auto;"><table><thead><tr><th>Customer</th><th>Items & Total</th><th>Status</th><th>Delivery</th></tr></thead><tbody id="orders-table"></tbody></table></div></div></div>
+        <div id="customers-view" class="view-section"><div class="card"><div class="card-header"><h3>Registered Customers</h3><button class="btn-primary" onclick="fetchData()">Refresh</button></div><div style="overflow-x: auto;"><table><thead><tr><th>User ID</th><th>Name</th><th>Phone</th><th>Actions</th></tr></thead><tbody id="customers-table"></tbody></table></div></div></div>
 
         <div id="chat-view" class="view-section">
             <div class="card" style="margin-bottom:0;">
@@ -233,7 +220,7 @@ button:active,
 
         <div id="settings-view" class="view-section">
             <div class="card">
-                <div class="card-header"><h3>Admin Profile & Settings</h3></div>
+                <div class="card-header"><h3>Admin Settings</h3></div>
                 <div class="form-grid">
                     <div class="form-group full-width" style="display: flex; align-items: center; gap: 20px;">
                         <img id="settings-avatar-preview" src="https://via.placeholder.com/80" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary);">
@@ -271,18 +258,10 @@ button:active,
         </div>
     </div>
     
-    <div class="modal-overlay" id="order-details-modal">
-        <div class="modal-content" style="max-width: 500px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px;">
-                <h2 style="font-family: 'Playfair Display', serif; color: var(--primary);">📦 Shipping Details</h2>
-                <button onclick="document.getElementById('order-details-modal').style.display='none'" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #f64e60;"><i class="fas fa-times-circle"></i></button>
-            </div>
-            <div id="od-content" style="font-size: 15px; line-height: 1.6;">Loading...</div>
-        </div>
-    </div>
-
+    <div class="modal-overlay" id="order-details-modal"><div class="modal-content"><div style="display: flex; justify-content: space-between; margin-bottom: 20px;"><h2 style="color: var(--primary);">📦 Details</h2><button onclick="document.getElementById('order-details-modal').style.display='none'" style="background:none; border:none; font-size:24px; color:#f64e60;"><i class="fas fa-times-circle"></i></button></div><div id="od-content"></div></div></div>
     <div class="modal-overlay" id="confirm-modal"><div class="modal-content" style="max-width: 350px; text-align: center;"><div style="font-size: 40px; margin-bottom: 15px;">🤔</div><h3 id="confirm-msg" style="margin-bottom: 20px;">Are you sure?</h3><div style="display: flex; gap: 10px;"><button class="btn-primary" style="background: #ccc; flex: 1;" onclick="document.getElementById('confirm-modal').style.display='none'">Cancel</button><button class="btn-primary" style="background: #f64e60; flex: 1;" id="confirm-yes-btn">Yes</button></div></div></div>
     <div class="modal-overlay" id="delete-auth-modal"><div class="modal-content" style="max-width: 350px; text-align: center;"><div style="font-size: 40px; margin-bottom: 15px;">⚠️</div><h3 style="margin-bottom: 15px; color:#f64e60;">Confirm Deletion</h3><input type="password" id="delete-auth-pass" placeholder="Deletion Password" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 6px;"><div style="display: flex; gap: 10px;"><button class="btn-primary" style="background: #ccc; flex: 1;" onclick="document.getElementById('delete-auth-modal').style.display='none'">Cancel</button><button class="btn-primary" style="background: #f64e60; flex: 1;" onclick="executeDelete()">Wipe Data</button></div></div></div>
+
     <script>
         const DB_URL = "https://leon-41242-default-rtdb.firebaseio.com/";
         let uploadedImagesBase64 = []; 
@@ -324,13 +303,64 @@ button:active,
             if(salesChartInstance) { salesChartInstance.destroy(); initChart(); fetchData(); }
         }
 
-        function handleAuth(type) {
-            const user = document.getElementById(`${type}-user`).value;
-            const pass = document.getElementById(`${type}-pass`).value;
-            if(type === 'login' && user === 'Leon1998' && pass === 'admin123') {
-                localStorage.setItem('rsAdminLoggedIn', 'true'); window.location.reload();
-            } else { showToast("❌ Incorrect Credentials!", "error"); }
+                function toggleAuthMode(mode) {
+            if(mode === 'register') {
+                document.getElementById('login-box').style.display = 'none';
+                document.getElementById('register-box').style.display = 'block';
+            } else {
+                document.getElementById('register-box').style.display = 'none';
+                document.getElementById('login-box').style.display = 'block';
+            }
         }
+
+        async function handleAuth(type, btnElement) {
+            const user = document.getElementById(`${type}-user`).value.trim();
+            const pass = document.getElementById(`${type}-pass`).value.trim();
+            
+            if(!user || !pass) return showToast("Enter Username & Password", "error");
+            
+            const originalText = btnElement.innerHTML;
+            btnElement.innerHTML = "Processing...";
+            
+            try {
+                // Master Admin Bypass (Always works)
+                if(type === 'login' && user === 'Leon1998' && pass === 'admin123') {
+                    localStorage.setItem('rsAdminLoggedIn', 'true'); 
+                    window.location.reload(); 
+                    return;
+                }
+                
+                const res = await fetch(DB_URL + 'admins.json');
+                const data = await res.json() || {};
+                const adminList = Object.values(data);
+                
+                if (type === 'register') {
+                    if (adminList.find(a => a.username === user) || user === 'Leon1998') {
+                        btnElement.innerHTML = originalText;
+                        return showToast("Username already taken!", "error");
+                    }
+                    await fetch(DB_URL + 'admins.json', { 
+                        method: 'POST', 
+                        body: JSON.stringify({username: user, password: pass}) 
+                    });
+                    showToast("Account Created! Please Login.", "success");
+                    toggleAuthMode('login');
+                    document.getElementById('login-user').value = user;
+                    document.getElementById('login-pass').value = '';
+                } else if (type === 'login') {
+                    if (adminList.find(a => a.username === user && a.password === pass)) {
+                        localStorage.setItem('rsAdminLoggedIn', 'true'); 
+                        window.location.reload();
+                    } else {
+                        showToast("❌ Incorrect Credentials!", "error");
+                    }
+                }
+            } catch(e) { 
+                showToast("Error connecting to server", "error"); 
+            }
+            btnElement.innerHTML = originalText;
+        }
+
         function handleLogout() { localStorage.removeItem('rsAdminLoggedIn'); window.location.reload(); }
         
         function switchTab(tabId, el) {
@@ -341,7 +371,6 @@ button:active,
             if(tabId !== 'analytics-view') document.getElementById('header-title').innerText = el ? el.innerText : '';
             if(window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
         }
-
         // Profile Pic Upload
         function updateProfilePic(event) {
             const file = event.target.files[0];
@@ -433,17 +462,19 @@ button:active,
                         if(o.status === "Delivered") { totalRev += parseInt(o.totalAmount); chartData[index % 7] += parseInt(o.totalAmount); }
                         if(o.status === "Pending") pendingOrders++;
                         
+                        // Analytics Logic
                         anaUnits++;
                         if(o.paymentType === 'UPI') anaUpi += parseInt(o.totalAmount);
                         if(o.paymentType === 'COD') anaCod += parseInt(o.totalAmount);
 
                         let statusColor = o.status === 'Pending' ? '#ffa800' : (o.status === 'Rejected' ? 'red' : '#1bc5bd');
-                        oTable.innerHTML += `<tr><td><b>${o.customerName}</b><br><span style="font-size:11px; color:#888;">${o.phone}</span></td><td>${o.items}<br><b style="color:var(--primary);">₹${o.totalAmount}</b></td><td><select onchange="updateOrder('${key}', 'status', this.value)" style="padding:5px; border:1px solid ${statusColor}; font-weight:bold; border-radius:4px; margin-bottom:5px;"><option value="Pending" ${o.status==='Pending'?'selected':''}>Pending</option><option value="Accepted" ${o.status==='Accepted'?'selected':''}>Accepted</option><option value="Shipped" ${o.status==='Shipped'?'selected':''}>Shipped</option><option value="Delivered" ${o.status==='Delivered'?'selected':''}>Delivered</option><option value="Rejected" ${o.status==='Rejected'?'selected':''}>Rejected</option></select></td><td><button onclick="viewFullOrder('${key}')" class="btn-primary" style="font-size:11px; width:100%; margin-bottom:5px; background:#8950fc;"><i class="fas fa-eye"></i> Show Details</button><input type="text" value="${o.deliveryTime || ''}" onblur="updateOrder('${key}', 'deliveryTime', this.value)" style="padding:5px; width:100%; margin-bottom:5px;" placeholder="e.g. In 7 days"><button onclick="updateOrder('${key}', 'save', '')" class="btn-primary" style="font-size:11px; width:100%;"><i class="fas fa-save"></i> Save</button></td></tr>`;
+                        oTable.innerHTML += `<tr><td><b>${o.customerName}</b><br><span style="font-size:11px; color:#888;">${o.phone}</span></td><td>${o.items}<br><b style="color:var(--primary);">₹${o.totalAmount}</b></td><td><select onchange="updateOrder('${key}', 'status', this.value)" style="padding:5px; border:1px solid ${statusColor}; font-weight:bold; border-radius:4px; margin-bottom:5px;"><option value="Pending" ${o.status==='Pending'?'selected':''}>Pending</option><option value="Accepted" ${o.status==='Accepted'?'selected':''}>Accepted</option><option value="Shipped" ${o.status==='Shipped'?'selected':''}>Shipped</option><option value="Delivered" ${o.status==='Delivered'?'selected':''}>Delivered</option><option value="Rejected" ${o.status==='Rejected'?'selected':''}>Rejected</option></select></td><td><button onclick="viewFullOrder('${key}')" class="btn-primary" style="width:100%; margin-bottom:5px; background:#8950fc;">Details</button><input type="text" value="${o.deliveryTime || ''}" onblur="updateOrder('${key}', 'deliveryTime', this.value)" style="padding:5px; width:100%; margin-bottom:5px;" placeholder="e.g. In 7 days"><button onclick="updateOrder('${key}', 'save', '')" class="btn-primary" style="width:100%;">Save</button></td></tr>`;
                     });
                 }
                 document.getElementById('dash-earnings').innerText = `₹${totalRev.toLocaleString()}`;
                 document.getElementById('dash-pending').innerText = pendingOrders;
                 
+                // Update Analytics View
                 document.getElementById('ana-units').innerText = anaUnits;
                 document.getElementById('ana-upi').innerText = `₹${anaUpi.toLocaleString()}`;
                 document.getElementById('ana-cod').innerText = `₹${anaCod.toLocaleString()}`;
@@ -452,40 +483,16 @@ button:active,
             } catch (e) {}
         }
 
-        /* ✨ RESTORED BEAUTIFUL MODAL LOGIC ✨ */
         async function viewFullOrder(dbKey) {
             document.getElementById('order-details-modal').style.display = 'flex';
-            document.getElementById('od-content').innerHTML = '<p style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Loading details...</p>';
+            document.getElementById('od-content').innerHTML = '<p>Loading...</p>';
             try {
-                let res = await fetch(`${DB_URL}orders/${dbKey}.json`); let o = await res.json(); let imagesHtml = '';
-                try {
-                    let pRes = await fetch(DB_URL + 'products.json'); let pData = await pRes.json();
-                    if(pData) {
-                        let rawItemsString = o.items.replace(/\[.*?\]/g, ''); 
-                        let itemNames = rawItemsString.split(',').map(s => s.trim().toLowerCase());
-                        let matchedProducts = [];
-                        Object.keys(pData).forEach(k => {
-                            let searchName = pData[k].name.toLowerCase();
-                            if(itemNames.some(itemName => itemName.includes(searchName))) { matchedProducts.push(pData[k]); }
-                        });
-                        if(matchedProducts.length > 0) {
-                            imagesHtml = `<div style="display:flex; gap:10px; margin-top:10px; overflow-x:auto; padding-bottom:5px;">`;
-                            matchedProducts.forEach(p => { imagesHtml += `<div style="text-align:center; min-width:70px;"><a href="${p.img}" target="_blank"><img src="${p.img}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; border:2px solid var(--primary);"></a><p style="font-size:10px; font-weight:bold; margin-top:4px; max-width:70px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${p.name}</p></div>`; });
-                            imagesHtml += `</div>`;
-                        }
-                    }
-                } catch(e) {}
-                
-                let html = `<div style="background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom:15px; border: 1px solid var(--border-color);"><h4 style="color:var(--primary); margin-bottom:10px;"><i class="fas fa-user"></i> Customer Info</h4><p><b>Name:</b> ${o.customerName}</p><p><b>Phone:</b> <a href="tel:${o.phone}" style="color:#3699ff; text-decoration:none;">${o.phone}</a></p></div><div style="background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom:15px; border: 1px solid var(--border-color);"><h4 style="color:var(--primary); margin-bottom:10px;"><i class="fas fa-map-marker-alt"></i> Delivery Address</h4><p>${o.address}</p></div><div style="background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom:15px; border: 1px solid var(--border-color);"><h4 style="color:var(--primary); margin-bottom:10px;"><i class="fas fa-shopping-bag"></i> Order Summary</h4><p><b>Items:</b> ${o.items}</p>${imagesHtml}<p style="margin-top:10px;"><b>Total Amount:</b> ₹${o.totalAmount}</p><p><b>Payment Mode:</b> <span class="badge" style="background:#333; color:white; padding:4px 8px; border-radius:4px; font-size:11px; text-transform:uppercase;">${o.paymentType || 'COD'}</span></p></div>`;
-                if(o.paymentType === 'UPI' && o.upiScreenshot) { html += `<div style="background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom:15px; border: 1px solid var(--border-color); text-align:center;"><h4 style="color:#6528F7; margin-bottom:10px;"><i class="fas fa-receipt"></i> Payment Screenshot</h4><img src="${o.upiScreenshot}" style="width:100%; max-width:250px; border-radius:8px; border:2px solid #ddd; cursor:pointer;" onclick="window.open(this.src)"></div>`; }
-                
-                let acceptBtnHtml = (o.status === 'Pending') ? `<button onclick="acceptOrderFromModal('${dbKey}')" style="width:100%; padding:15px; margin-top:15px; background:#1bc5bd; color:white; border:none; border-radius:8px; font-weight:bold; font-size:16px; cursor:pointer;"><i class="fas fa-check-circle"></i> Accept Order</button>` : '';
-                html += acceptBtnHtml;
+                let res = await fetch(`${DB_URL}orders/${dbKey}.json`); let o = await res.json();
+                let html = `<div style="margin-bottom:15px;"><p><b>Name:</b> ${o.customerName}</p><p><b>Phone:</b> ${o.phone}</p><p><b>Address:</b> ${o.address}</p><p><b>Items:</b> ${o.items}</p><p><b>Total Amount:</b> ₹${o.totalAmount}</p><p><b>Payment Mode:</b> ${o.paymentType}</p></div>`;
+                if(o.paymentType === 'UPI' && o.upiScreenshot) { html += `<div><h4 style="color:#6528F7; margin-bottom:10px;">Payment Screenshot</h4><img src="${o.upiScreenshot}" style="width:100%; max-width:250px; border-radius:8px; border:2px solid #ddd; cursor:pointer;" onclick="window.open(this.src)"></div>`; }
                 document.getElementById('od-content').innerHTML = html;
-            } catch(e) { document.getElementById('od-content').innerHTML = '<p style="color:red;">Error loading data.</p>'; }
+            } catch(e) {}
         }
-
-        async function acceptOrderFromModal(id) { await updateOrder(id, 'status', 'Accepted'); document.getElementById('order-details-modal').style.display = 'none'; fetchData(); }
 
         function toggleBanUser(dbKey, isBanned) { customConfirm(`Confirm action?`, async () => { await fetch(`${DB_URL}users/${dbKey}.json`, { method: 'PATCH', body: JSON.stringify({ banned: !isBanned }) }); fetchData(); showToast(`User updated!`, 'success'); }); }
         function deleteProduct(id) { customConfirm("Delete this product?", async () => { await fetch(DB_URL + 'products/' + id + '.json', { method: 'DELETE' }); fetchData(); showToast("Product deleted!", 'info'); }); }
@@ -493,13 +500,18 @@ button:active,
         
         function resizeImage(file) { return new Promise((resolve) => { const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const scale = 500 / img.width; canvas.width = 500; canvas.height = img.height * scale; canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height); resolve(canvas.toDataURL('image/jpeg', 0.7)); }; img.src = e.target.result; }; reader.readAsDataURL(file); }); }
 
-  // Multi Image Upload
+        // Multi Image Upload Fix
         async function processMultipleImages(event) {
             const files = event.target.files;
             if(files.length > 4) return showToast("Max 4 images allowed!", "error");
             document.getElementById('multi-image-preview').innerHTML = '<p>Processing...</p>';
-            uploadedImagesBase64 = []; let previewHtml = '';
-            for(let i=0; i<files.length; i++) { let b64 = await resizeImage(files[i]); uploadedImagesBase64.push(b64); previewHtml += `<img src="${b64}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; border:2px solid var(--primary);">`; }
+            uploadedImagesBase64 = [];
+            let previewHtml = '';
+            for(let i=0; i<files.length; i++) {
+                let b64 = await resizeImage(files[i]);
+                uploadedImagesBase64.push(b64);
+                previewHtml += `<img src="${b64}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; border:2px solid var(--primary);">`;
+            }
             document.getElementById('multi-image-preview').innerHTML = previewHtml;
         }
 
