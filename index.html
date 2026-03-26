@@ -498,13 +498,24 @@
                     Object.keys(pData).reverse().forEach(key => {
                         let p = pData[key]; productCount++; 
                         let statusBadge = p.status === 'Active' ? `<span style="color:#1bc5bd; font-weight:bold;">● In Stock</span>` : `<span style="color:#f64e60; font-weight:bold;">● Out of Stock</span>`;
+                                            Object.keys(pData).reverse().forEach(key => {
+                        let p = pData[key]; productCount++; 
+                        let statusBadge = p.status === 'Active' ? `<span style="color:#1bc5bd; font-weight:bold;">● In Stock</span>` : `<span style="color:#f64e60; font-weight:bold;">● Out of Stock</span>`;
                         pTable.innerHTML += `<tr>
                             <td><img src="${p.img}" style="width:40px; height:40px; border-radius:5px;"></td>
                             <td><b>${p.name}</b><br><span style="font-size:11px;">Mode: ${p.paymentMode||'Both'}</span></td>
                             <td>₹${p.price}</td>
                             <td><b>${p.stock} units</b><br>${statusBadge}</td>
-                            <td><button onclick="deleteProduct('${key}')" style="background:#f64e60; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;"><i class="fas fa-trash"></i> Delete</button></td>
+                            <td>
+                                <div style="display:flex; gap:5px; margin-bottom:5px;">
+                                    <input type="number" id="stock-${key}" value="${p.stock}" style="width:60px; padding:5px; border:1px solid var(--border-color); border-radius:4px; background:var(--input-bg); color:var(--text-main);">
+                                    <button onclick="updateStock('${key}')" style="background:#3699ff; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;"><i class="fas fa-save"></i></button>
+                                </div>
+                                <button onclick="deleteProduct('${key}')" style="background:#f64e60; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; width:100%;"><i class="fas fa-trash"></i> Delete</button>
+                            </td>
                         </tr>`;
+                    });
+
                     });
                 }
                 document.getElementById('dash-products').innerText = productCount;
@@ -579,6 +590,28 @@
         async function acceptOrderFromModal(id) { await updateOrder(id, 'status', 'Accepted'); document.getElementById('order-details-modal').style.display = 'none'; fetchData(); }
 
         function toggleBanUser(dbKey, isBanned) { customConfirm(`Confirm action?`, async () => { await fetch(`${DB_URL}users/${dbKey}.json`, { method: 'PATCH', body: JSON.stringify({ banned: !isBanned }) }); fetchData(); showToast(`User updated!`, 'success'); }); }
+        
+        
+                async function updateStock(id) {
+            const newStock = parseInt(document.getElementById('stock-' + id).value);
+            if (isNaN(newStock) || newStock < 0) return showToast("Invalid stock value", "error");
+            
+            const newStatus = newStock > 0 ? 'Active' : 'Out of Stock';
+            
+            try {
+                await fetch(DB_URL + 'products/' + id + '.json', { 
+                    method: 'PATCH', 
+                    body: JSON.stringify({ stock: newStock, status: newStatus }) 
+                });
+                showToast("Stock updated successfully!", "success");
+                fetchData();
+            } catch(e) { 
+                showToast("Failed to update stock", "error"); 
+            }
+        }
+
+
+
         function deleteProduct(id) { customConfirm("Delete this product?", async () => { await fetch(DB_URL + 'products/' + id + '.json', { method: 'DELETE' }); fetchData(); showToast("Product deleted!", 'info'); }); }
         async function updateOrder(id, field, value) { if(field === 'save') return showToast("Order updated!", "success"); let data = {}; data[field] = value; await fetch(DB_URL + 'orders/' + id + '.json', { method: 'PATCH', body: JSON.stringify(data) }); }
         
