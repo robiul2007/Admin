@@ -347,11 +347,15 @@
             
             try {
                 // Master Admin Bypass (Always works)
-                if(type === 'login' && user === 'Leon1998' && pass === 'admin123') {
+                if(type === 'login' && user === 'Raizo250' && pass === 'Raizo250') {
                     localStorage.setItem('rsAdminLoggedIn', 'true'); 
                     window.location.reload(); 
                     return;
                 }
+                
+                
+                
+                
                 
                 const res = await fetch(DB_URL + 'admins.json');
                 const data = await res.json() || {};
@@ -431,13 +435,51 @@
         function showResetDelPass() { document.getElementById('reset-del-pass-section').style.display = 'block'; document.getElementById('forgot-del-btn').style.display = 'none'; }
         function hideResetDelPass() { document.getElementById('reset-del-pass-section').style.display = 'none'; document.getElementById('forgot-del-btn').style.display = 'inline'; }
         
-        function resetDeletePassword() {
-            if(document.getElementById('reset-user').value === 'Leon1998' && document.getElementById('reset-login-pass').value === 'admin123') {
-                const newDel = document.getElementById('reset-new-del-pass').value;
-                if(!newDel) return showToast('Enter new password', 'error');
-                localStorage.setItem('rsDeletePassword', newDel); showToast('Password Reset!', 'success'); hideResetDelPass(); checkDeletePasswordState();
-            } else { showToast('Invalid Admin Credentials', 'error'); }
+        
+        
+        
+        
+        
+                async function resetDeletePassword() {
+            const user = document.getElementById('reset-user').value.trim();
+            const pass = document.getElementById('reset-login-pass').value.trim();
+            const newDel = document.getElementById('reset-new-del-pass').value;
+
+            if(!user || !pass) return showToast('Enter Admin Credentials', 'error');
+            if(!newDel) return showToast('Enter new deletion password', 'error');
+
+            try {
+                let isValid = false;
+                
+                // 1. Check if it is the Master Admin
+                if(user === 'Leon1998' && pass === 'admin123') {
+                    isValid = true;
+                } else {
+                    // 2. Check the Firebase Database for new Registered Admins
+                    const res = await fetch(DB_URL + 'admins.json');
+                    const data = await res.json() || {};
+                    const adminList = Object.values(data);
+                    if (adminList.find(a => a.username === user && a.password === pass)) {
+                        isValid = true;
+                    }
+                }
+
+                if(isValid) {
+                    localStorage.setItem('rsDeletePassword', newDel); 
+                    showToast('Password Reset Successful!', 'success'); 
+                    hideResetDelPass(); 
+                    checkDeletePasswordState();
+                } else {
+                    showToast('Invalid Admin Credentials', 'error');
+                }
+            } catch(e) {
+                showToast('Error verifying credentials', 'error');
+            }
         }
+
+
+
+
 
         function promptDelete(type) { if(!localStorage.getItem('rsDeletePassword')) return showToast("⚠️ Set a password first!", "error"); pendingDeleteType = type; document.getElementById('delete-auth-pass').value = ''; document.getElementById('delete-auth-modal').style.display = 'flex'; }
         async function executeDelete() {
