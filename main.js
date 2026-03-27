@@ -1,4 +1,4 @@
-const DB_URL = "https://leon-41242-default-rtdb.firebaseio.com/";
+const DB_URL = "https://virat-fashion-default-rtdb.firebaseio.com/";
 
 let products = [];
 let cart = [];
